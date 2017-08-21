@@ -11,7 +11,7 @@
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.5",
-    "redux": "^3.6.0"
+    "redux": "^3.7.2"
   },
   "devDependencies": {
     "prettier": "^1.4.4",
