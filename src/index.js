@@ -1,23 +1,8 @@
-import {createStore} from 'redux'
 import expect from 'expect';
 import './index.css';
 
 console.log('all test passed!');
 expect(1).toEqual(1)
-
-//function counter(state, action) {
-//  if (typeof state === 'undefined') {
-//    return 0; // If state is undefined, return the initial application state
-//  }
-//
-//  if (action.type === 'INCREMENT') {
-//    return state + 1;
-//  } else if (action.type === 'DECREMENT') {
-//    return state - 1;
-//  } else {
-//    return state; // In case an action is passed in we don't understand
-//  }
-//}
 
 const counter = (state = 0, action) => {
   switch (action.type) {
@@ -30,12 +15,36 @@ const counter = (state = 0, action) => {
   }
 }
 
+const createStore = (reducer) => {
+  let state;
+  let listeners = [];
+
+  const getState = () => state;
+
+  const dispatch = (action) => {
+    state = reducer(state, action);
+    listeners.forEach(listener => listener());
+  }
+  const subscribe = (listener) => {
+    listeners.push(listener);
+    return () => {
+      listeners = listeners.filter(l => l !== listener);
+    }
+  };
+
+  dispatch({}); // initialize
+
+  return { getState, dispatch, subscribe };
+}
+
+
 const store = createStore(counter);
 
 const render = () => {
   document.body.innerText = store.getState();
 }
 
+// store に対して dispatch されると、呼び出されるハンドラ的なやつ
 store.subscribe(render);
 render();
 
