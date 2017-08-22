@@ -1,8 +1,47 @@
+import React from 'react'
+import ReactDOM from 'react-dom'
+import deepFreeze from 'deep-freeze';
 import expect from 'expect';
 import './index.css';
+const todos = (state = [], action) => {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return [
+        ...state,
+        {
+          id: action.id,
+          text: action.text,
+          completed: false
+        }
+      ];
+    default:
+      return state;
+  }
+};
 
-console.log('all test passed!');
-expect(1).toEqual(1)
+const testAddTodo = () => {
+  const stateBefore = [];
+  const action = {
+      type: 'ADD_TODO',
+      id: 0,
+      text: 'Learn Redux'
+  };
+  const stateAfter = [{
+      id: 0,
+      text: 'Learn Redux',
+      completed: false
+  }];
+
+  deepFreeze(stateBefore);
+  deepFreeze(action);
+
+  expect(
+    todos(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+
+testAddTodo();
+console.log('All tests passed')
 
 const counter = (state = 0, action) => {
   switch (action.type) {
@@ -40,17 +79,39 @@ const createStore = (reducer) => {
 
 const store = createStore(counter);
 
+const Counter = ({
+  value,
+  onIncrement,
+  onDecrement
+}) => (
+  <div>
+    <h1>{value}</h1>
+    <button onClick={onIncrement}>+</button>
+    <button onClick={onDecrement}>-</button>
+  </div>
+)
+
 const render = () => {
-  document.body.innerText = store.getState();
+  ReactDOM.render(
+    <Counter
+      value={store.getState()}
+      onIncrement = {() =>
+          store.dispatch({
+            type: 'INCREMENT'
+      })}
+      onDecrement ={() =>
+          store.dispatch({
+            type: 'DECREMENT'
+          })
+      }
+    />,
+    document.getElementById('root')
+  )
 }
 
 // store に対して dispatch されると、呼び出されるハンドラ的なやつ
 store.subscribe(render);
 render();
-
-document.addEventListener('click', () => {
-    store.dispatch({ type : 'INCREMENT' })
-});
 
 expect (
   counter(0, { type: 'INCREMENT' })
