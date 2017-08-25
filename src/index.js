@@ -57,7 +57,8 @@ const FilterLink = ({
   }
   return (
     <a href='#'
-       onClick={e => {
+      onClick={e => {
+        // href で指定したリンク先に飛ばないようにするため
          e.preventDefault();
          store.dispatch({
            type: 'SET_VISIBILITY_FILTER',
@@ -238,5 +239,10 @@ const render = () => {
   );
 };
 
+const testRender = () => {
+  console.log(store.getState())
+}
+
 store.subscribe(render);
+store.subscribe(testRender);
 render();
