@@ -280,9 +280,8 @@ class VisibleTodoList extends Component {
     );
   }
 }
-const AddTodo = ({
-  onAddClick
-}) => {
+let nextTodoId = 0;
+const AddTodo = () => {
   let input;
 
   return (
@@ -291,42 +290,32 @@ const AddTodo = ({
         input = node;
       }} />
     <button onClick={() => {
-      onAddClick(input.value);
-      input.value = '';
+        store.dispatch({
+          type: 'ADD_TODO',
+          id: nextTodoId++,
+          text: input.value,
+        })
+        input.value = '';
     }}>
-      Add Todo
-    </button>
-  </div>
+        Add Todo
+      </button>
+    </div>
   );
 };
 
-let nextTodoId = 0;
-const TodoApp = ({
-  todos,
-  visibilityFilter
-}) => {
-  return (
+const TodoApp = () => (
     <div>
-      <AddTodo
-        onAddClick={text =>
-            store.dispatch({
-              type: 'ADD_TODO',
-              id: nextTodoId++,
-              text,
-            })
-        }
-      />
+      <AddTodo />
       <VisibleTodoList />
       <Footer />
     </div>
-  );
-}
+)
 // See Section 8 for earlier `render()` example
 const render = () => {
   ReactDOM.render(
     // Render the TodoApp Component to the <div> with id 'root'
     //<TodoApp todos={store.getState().todos} visibilityFilter={store.getState().visibilityFilter} />,
-    <TodoApp {...store.getState()} />,
+    <TodoApp />,
     document.getElementById('root'),
   );
 };
