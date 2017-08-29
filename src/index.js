@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import deepFreeze from 'deep-freeze';
 import expect from 'expect';
 import './index.css';
+//const { Component } = React;
 
 const todo = (state, action) => {
   switch (action.type) {
@@ -47,53 +48,104 @@ const visibilityFilter = (state = 'SHOW_ALL', action) => {
   }
 };
 
-const FilterLink = ({
-  filter,
-  currentFilter,
+const Link = ({
+  active,
   children,
   onClick
 }) => {
-  if (filter === currentFilter) {
+  if (active) {
     return <span>{children}</span>
   }
+
   return (
     <a href='#'
       onClick={e => {
-        // href で指定したリンク先に飛ばないようにするため
         e.preventDefault();
-        onClick(filter);
-       }}
+        onClick();
+      }}
     >
       {children}
     </a>
-  )
+  );
+};
+class FilterLink extends Component {
+  componentDidMount() {
+    this.unsubscribe = store.subscribe(() =>
+      this.forceUpdate()
+    );
+  }
+
+  // Since the subscription happens in `componentDidMount`,
+  // it's important to unsubscribe in `componentWillUnmount`.
+  componentWillUnmount() {
+    this.unsubscribe(); // return value of `store.subscribe()`
+  }
+
+  render () {
+    const props = this.props;
+    // this just reads the store, is not listening
+    // for change messages from the store updating
+    const state = store.getState();
+
+    return (
+      <Link
+        active={
+          props.filter ===
+          state.visibilityFilter
+        }
+        onClick={() =>
+          store.dispatch({
+            type: 'SET_VISIBILITY_FILTER',
+            filter: props.filter
+          })
+        }
+      >
+        {props.children}
+      </Link>
+    );
+  }
 }
 
-const Footer = ({
-  visibilityFilter,
-  onFilterClick
-}) => (
+//const FilterLink = ({
+//  filter,
+//  currentFilter,
+//  children,
+//  onClick
+//}) => {
+//  if (filter === currentFilter) {
+//    return <span>{children}</span>
+//  }
+//  return (
+//    <a href='#'
+//      onClick={e => {
+//        // href で指定したリンク先に飛ばないようにするため
+//        e.preventDefault();
+//        onClick(filter);
+//       }}
+//    >
+//      {children}
+//    </a>
+//  )
+//}
+
+const Footer = () => (
   <p>
+    Show:
+    {' '}
     <FilterLink
       filter='SHOW_ALL'
-      currentFilter={visibilityFilter}
-      onClick={onFilterClick}
     >
       All
     </FilterLink>
     {', '}
     <FilterLink
       filter='SHOW_ACTIVE'
-      currentFilter={visibilityFilter}
-      onClick={onFilterClick}
     >
       Active
     </FilterLink>
       {', '}
     <FilterLink
       filter='SHOW_COMPLETED'
-      currentFilter={visibilityFilter}
-      onClick={onFilterClick}
     >
       Completed
     </FilterLink>
@@ -161,8 +213,6 @@ const createStore = reducer => {
 };
 
 const store = createStore(todoApp);
-
-const { Component } = React;
 
 const Todo = ({
   onClick,
