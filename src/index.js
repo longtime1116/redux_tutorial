@@ -70,6 +70,7 @@ const Link = ({
 };
 class FilterLink extends Component {
   componentDidMount() {
+    const { store } = this.context;
     this.unsubscribe = store.subscribe(() =>
       this.forceUpdate()
     );
@@ -83,8 +84,7 @@ class FilterLink extends Component {
 
   render () {
     const props = this.props;
-    // this just reads the store, is not listening
-    // for change messages from the store updating
+    const { store } = this.context;
     const state = store.getState();
 
     return (
@@ -106,27 +106,9 @@ class FilterLink extends Component {
   }
 }
 
-//const FilterLink = ({
-//  filter,
-//  currentFilter,
-//  children,
-//  onClick
-//}) => {
-//  if (filter === currentFilter) {
-//    return <span>{children}</span>
-//  }
-//  return (
-//    <a href='#'
-//      onClick={e => {
-//        // href で指定したリンク先に飛ばないようにするため
-//        e.preventDefault();
-//        onClick(filter);
-//       }}
-//    >
-//      {children}
-//    </a>
-//  )
-//}
+FilterLink.contextTypes = {
+  store: React.PropTypes.object
+}
 
 const Footer = () => (
   <p>
@@ -249,6 +231,7 @@ const TodoList = ({
 
 class VisibleTodoList extends Component {
   componentDidMount() {
+    const { store } = this.context;
     this.unsubscribe = store.subscribe(() =>
       this.forceUpdate()
     );
@@ -260,6 +243,7 @@ class VisibleTodoList extends Component {
 
   render () {
     const props = this.props;
+    const { store } = this.context;
     const state = store.getState();
 
     return (
@@ -280,8 +264,13 @@ class VisibleTodoList extends Component {
     );
   }
 }
+
+VisibleTodoList.contextTypes = {
+  store: React.PropTypes.object
+}
+
 let nextTodoId = 0;
-const AddTodo = () => {
+const AddTodo = (props, { store }) => {
   let input;
 
   return (
@@ -303,6 +292,11 @@ const AddTodo = () => {
   );
 };
 
+// 受け取る側
+AddTodo.contextTypes = {
+  store: React.PropTypes.object
+}
+
 const TodoApp = () => (
     <div>
       <AddTodo />
@@ -310,12 +304,29 @@ const TodoApp = () => (
       <Footer />
     </div>
 )
+class Provider extends Component {
+  getChildContext() {
+    return {
+      // ここに追加すれば、増やせる
+      store: this.props.store // This corresponds to the `store` passed in as a prop
+    };
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
+// 渡す側
+Provider.childContextTypes = {
+  store: React.PropTypes.object
+}
+
 // See Section 8 for earlier `render()` example
 const render = () => {
   ReactDOM.render(
-    // Render the TodoApp Component to the <div> with id 'root'
-    //<TodoApp todos={store.getState().todos} visibilityFilter={store.getState().visibilityFilter} />,
-    <TodoApp />,
+    <Provider store={createStore(todoApp)}>
+      <TodoApp />
+    </Provider>,
     document.getElementById('root'),
   );
 };
