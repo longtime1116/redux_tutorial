@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import deepFreeze from 'deep-freeze';
 import expect from 'expect';
 import './index.css';
@@ -304,22 +305,22 @@ const TodoApp = () => (
       <Footer />
     </div>
 )
-class Provider extends Component {
-  getChildContext() {
-    return {
-      // ここに追加すれば、増やせる
-      store: this.props.store // This corresponds to the `store` passed in as a prop
-    };
-  }
-
-  render() {
-    return this.props.children;
-  }
-}
+//class Provider extends Component {
+//  getChildContext() {
+//    return {
+//      // ここに追加すれば、増やせる
+//      store: this.props.store // This corresponds to the `store` passed in as a prop
+//    };
+//  }
+//
+//  render() {
+//    return this.props.children;
+//  }
+//}
 // 渡す側
-Provider.childContextTypes = {
-  store: React.PropTypes.object
-}
+//Provider.childContextTypes = {
+//  store: React.PropTypes.object
+//}
 
 // See Section 8 for earlier `render()` example
 const render = () => {
