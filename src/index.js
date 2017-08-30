@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { connect } from 'react-redux';
 import deepFreeze from 'deep-freeze';
 import expect from 'expect';
 import './index.css';
@@ -230,45 +231,70 @@ const TodoList = ({
   </ul>
 )
 
-class VisibleTodoList extends Component {
-  componentDidMount() {
-    const { store } = this.context;
-    this.unsubscribe = store.subscribe(() =>
-      this.forceUpdate()
-    );
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe(); // return value of `store.subscribe()`
-  }
-
-  render () {
-    const props = this.props;
-    const { store } = this.context;
-    const state = store.getState();
-
-    return (
-      <TodoList
-        todos={
-          getVisibleTodos(
-            state.todos,
-            state.visibilityFilter
-          )
-        }
-        onTodoClick={id =>
-          store.dispatch({
-            type: 'TOGGLE_TODO',
-            id
-          })
-        }
-      />
-    );
+const mapStateToProps = (state) => {
+  return {
+    todos: getVisibleTodos (
+      state.todos,
+      state.visibilityFilter
+    )
   }
 }
 
-VisibleTodoList.contextTypes = {
-  store: React.PropTypes.object
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onTodoClick: (id) => {
+      dispatch({
+        type: "TOGGLE_TODO",
+        id
+      })
+    }
+  };
 }
+
+const VisibleTodoList = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TodoList)
+
+//class VisibleTodoList extends Component {
+//  componentDidMount() {
+//    const { store } = this.context;
+//    this.unsubscribe = store.subscribe(() =>
+//      this.forceUpdate()
+//    );
+//  }
+//
+//  componentWillUnmount() {
+//    this.unsubscribe(); // return value of `store.subscribe()`
+//  }
+//
+//  render () {
+//    const props = this.props;
+//    const { store } = this.context;
+//    const state = store.getState();
+//
+//    return (
+//      <TodoList
+//        todos={
+//          getVisibleTodos(
+//            state.todos,
+//            state.visibilityFilter
+//          )
+//        }
+//        onTodoClick={id =>
+//          store.dispatch({
+//            type: 'TOGGLE_TODO',
+//            id
+//          })
+//        }
+//      />
+//    );
+//  }
+//}
+//
+//VisibleTodoList.contextTypes = {
+//  store: React.PropTypes.object
+//}
 
 let nextTodoId = 0;
 const AddTodo = (props, { store }) => {
@@ -305,6 +331,7 @@ const TodoApp = () => (
       <Footer />
     </div>
 )
+
 //class Provider extends Component {
 //  getChildContext() {
 //    return {
