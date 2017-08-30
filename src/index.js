@@ -297,7 +297,7 @@ const VisibleTodoList = connect(
 //}
 
 let nextTodoId = 0;
-const AddTodo = (props, { store }) => {
+let AddTodo = ({ dispatch }) => {
   let input;
 
   return (
@@ -306,7 +306,7 @@ const AddTodo = (props, { store }) => {
         input = node;
       }} />
     <button onClick={() => {
-        store.dispatch({
+        dispatch({
           type: 'ADD_TODO',
           id: nextTodoId++,
           text: input.value,
@@ -319,10 +319,15 @@ const AddTodo = (props, { store }) => {
   );
 };
 
-// 受け取る側
-AddTodo.contextTypes = {
-  store: React.PropTypes.object
-}
+AddTodo = connect()(AddTodo)
+//AddTodo = connect(
+//  state => {
+//    return {};
+//  },
+//  dispatch => {
+//    return { dispatch };
+//  }
+//)(AddTodo);
 
 const TodoApp = () => (
     <div>
