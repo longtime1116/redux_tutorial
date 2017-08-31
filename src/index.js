@@ -251,6 +251,7 @@ const mapDispatchToProps = (dispatch) => {
   };
 }
 
+// redux の store と react の component を connect している. react の props に移す
 const VisibleTodoList = connect(
   mapStateToProps,
   mapDispatchToProps
