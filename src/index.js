@@ -70,47 +70,74 @@ const Link = ({
     </a>
   );
 };
-class FilterLink extends Component {
-  componentDidMount() {
-    const { store } = this.context;
-    this.unsubscribe = store.subscribe(() =>
-      this.forceUpdate()
-    );
-  }
 
-  // Since the subscription happens in `componentDidMount`,
-  // it's important to unsubscribe in `componentWillUnmount`.
-  componentWillUnmount() {
-    this.unsubscribe(); // return value of `store.subscribe()`
-  }
 
-  render () {
-    const props = this.props;
-    const { store } = this.context;
-    const state = store.getState();
-
-    return (
-      <Link
-        active={
-          props.filter ===
-          state.visibilityFilter
-        }
-        onClick={() =>
-          store.dispatch({
-            type: 'SET_VISIBILITY_FILTER',
-            filter: props.filter
-          })
-        }
-      >
-        {props.children}
-      </Link>
-    );
+const mapStateToLinkProps = (state, ownProps) => {
+  return {
+    active:
+    ownProps.filter ===
+    state.visibilityFilter
   }
 }
 
-FilterLink.contextTypes = {
-  store: React.PropTypes.object
+const mapDispatchToLinkProps = (dispatch, ownProps) => {
+  return {
+    onClick: () => {
+      dispatch({
+        type: 'SET_VISIBILITY_FILTER',
+        filter: ownProps.filter
+      })
+    }
+  }
 }
+
+// redux の store と react の component を connect している. react の props に移す
+const FilterLink = connect(
+  mapStateToLinkProps,
+  mapDispatchToLinkProps
+)(Link)
+
+//class FilterLink extends Component {
+//  componentDidMount() {
+//    const { store } = this.context;
+//    this.unsubscribe = store.subscribe(() =>
+//      this.forceUpdate()
+//    );
+//  }
+//
+//  // Since the subscription happens in `componentDidMount`,
+//  // it's important to unsubscribe in `componentWillUnmount`.
+//  componentWillUnmount() {
+//    this.unsubscribe(); // return value of `store.subscribe()`
+//  }
+//
+//  render () {
+//    const props = this.props;
+//    const { store } = this.context;
+//    const state = store.getState();
+//
+//    return (
+//      <Link
+//        active={
+//          props.filter ===
+//          state.visibilityFilter
+//        }
+//        onClick={() =>
+//          store.dispatch({
+//            type: 'SET_VISIBILITY_FILTER',
+//            filter: props.filter
+//          })
+//        }
+//      >
+//        {props.children}
+//      </Link>
+//    );
+//  }
+//}
+//
+//FilterLink.contextTypes = {
+//  store: React.PropTypes.object
+//}
 
 const Footer = () => (
   <p>
@@ -231,7 +258,7 @@ const TodoList = ({
   </ul>
 )
 
-const mapStateToProps = (state) => {
+const mapStateToTodoListProps = (state) => {
   return {
     todos: getVisibleTodos (
       state.todos,
@@ -240,7 +267,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToTodoListProps = (dispatch) => {
   return {
     onTodoClick: (id) => {
       dispatch({
@@ -253,8 +280,8 @@ const mapDispatchToProps = (dispatch) => {
 
 // redux の store と react の component を connect している. react の props に移す
 const VisibleTodoList = connect(
-  mapStateToProps,
-  mapDispatchToProps
+  mapStateToTodoListProps,
+  mapDispatchToTodoListProps
 )(TodoList)
 
 //class VisibleTodoList extends Component {
